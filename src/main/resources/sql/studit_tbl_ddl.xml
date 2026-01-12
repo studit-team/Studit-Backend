@@ -55,7 +55,7 @@ COMMENT ON COLUMN USERSCRTYESTBS.user_ty_code IS '사용자 유형 코드';
 COMMENT ON COLUMN USERSCRTYESTBS.author_code IS '권한 코드';
 
 -- 5. 회원 정보 (중요 정보 - UUID)
-CREATE TABLE "USER" (
+CREATE TABLE user_info (
     user_id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(20) NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -67,22 +67,22 @@ CREATE TABLE "USER" (
     lgn_fail_nocs INTEGER DEFAULT 0,
     sctry_dtrmn_trget_id VARCHAR(36) UNIQUE REFERENCES USERSCRTYESTBS(sctry_dtrmn_trget_id)
 );
-COMMENT ON TABLE "USER" IS '회원 정보';
-COMMENT ON COLUMN "USER".user_id IS '사용자 ID';
-COMMENT ON COLUMN "USER".username IS '사용자 명';
-COMMENT ON COLUMN "USER".password IS '비밀번호';
-COMMENT ON COLUMN "USER".phone IS '휴대폰 번호';
-COMMENT ON COLUMN "USER".email IS '이메일';
-COMMENT ON COLUMN "USER".user_sttus_code IS '사용자 상태 코드';
-COMMENT ON COLUMN "USER".sbscrb_be IS '가입날짜';
-COMMENT ON COLUMN "USER".lgn_aprv_yn IS '로그인 제한 여부';
-COMMENT ON COLUMN "USER".lgn_fail_nocs IS '로그인 실패 횟수';
-COMMENT ON COLUMN "USER".sctry_dtrmn_trget_id IS '보안설정 ID';
+COMMENT ON TABLE user_info IS '회원 정보';
+COMMENT ON COLUMN user_info.user_id IS '사용자 ID';
+COMMENT ON COLUMN user_info.username IS '사용자 명';
+COMMENT ON COLUMN user_info.password IS '비밀번호';
+COMMENT ON COLUMN user_info.phone IS '휴대폰 번호';
+COMMENT ON COLUMN user_info.email IS '이메일';
+COMMENT ON COLUMN user_info.user_sttus_code IS '사용자 상태 코드';
+COMMENT ON COLUMN user_info.sbscrb_be IS '가입날짜';
+COMMENT ON COLUMN user_info.lgn_aprv_yn IS '로그인 제한 여부';
+COMMENT ON COLUMN user_info.lgn_fail_nocs IS '로그인 실패 횟수';
+COMMENT ON COLUMN user_info.sctry_dtrmn_trget_id IS '보안설정 ID';
 
 -- 6. SNS 정보
 CREATE TABLE USER_SNS_INFO (
     sns_id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     sns_ty_code VARCHAR(20),
     sns_email VARCHAR(50),
     sns_connect_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -97,7 +97,7 @@ COMMENT ON COLUMN USER_SNS_INFO.sns_connect_date IS 'SNS 연동 날짜';
 -- 7. 인증 정보
 CREATE TABLE USER_CERT_ESTBS (
     cert_id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     cert_no VARCHAR(50),
     cert_ty_code VARCHAR(20),
     extsh_de VARCHAR(20),
@@ -114,7 +114,7 @@ COMMENT ON COLUMN USER_CERT_ESTBS.cert_yn IS '인증 여부';
 -- 8. 로그인 이력
 CREATE TABLE USER_LGN_HSTRY (
     lgn_id SERIAL PRIMARY KEY,
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     lgn_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     lgn_ip VARCHAR(45),
     lgn_sttus VARCHAR(20)
@@ -128,7 +128,7 @@ COMMENT ON COLUMN USER_LGN_HSTRY.lgn_sttus IS '로그인 상태';
 -- 9. 스터디 기본 구조 (일반 정보 - SERIAL)
 CREATE TABLE STUDY (
     study_id SERIAL PRIMARY KEY,
-    leader_id VARCHAR(36) REFERENCES "USER"(user_id),
+    leader_id VARCHAR(36) REFERENCES user_info(user_id),
     study_nm VARCHAR(100) NOT NULL,
     study_dc TEXT,
     category VARCHAR(20),
@@ -149,7 +149,7 @@ COMMENT ON COLUMN STUDY.study_sttus_code IS '스터디 상태 코드';
 -- 10. 스터디 멤버 구성
 CREATE TABLE STUDY_MBR (
     study_id INTEGER REFERENCES STUDY(study_id),
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     role_code VARCHAR(20) REFERENCES STUDY_ROLE(role_code),
     join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     mbr_sttus_code VARCHAR(20),
@@ -166,7 +166,7 @@ COMMENT ON COLUMN STUDY_MBR.mbr_sttus_code IS '(승인/대기) 상태 코드';
 CREATE TABLE APPLICATIONS (
     applications_id SERIAL PRIMARY KEY,
     study_id INTEGER REFERENCES STUDY(study_id),
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     content TEXT,
     status VARCHAR(20),
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -183,7 +183,7 @@ COMMENT ON COLUMN APPLICATIONS.applied_at IS '신청 날짜';
 CREATE TABLE BOARD (
     board_id SERIAL PRIMARY KEY,
     study_id INTEGER REFERENCES STUDY(study_id),
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     title VARCHAR(200),
     content TEXT,
     file_url TEXT,
@@ -216,8 +216,8 @@ COMMENT ON COLUMN TASKS.created_at IS '생성 날짜';
 -- 14. 과제 제출 정보
 CREATE TABLE TASK_SUBMISSIONS (
     submissions_id SERIAL PRIMARY KEY,
-    task_id INTEGER REFERENCES TASKS(id),
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    task_id INTEGER REFERENCES TASKS(task_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     status VARCHAR(20),
     submitted_at TIMESTAMP
 );
@@ -232,7 +232,7 @@ COMMENT ON COLUMN TASK_SUBMISSIONS.submitted_at IS '실제 제출 일시';
 CREATE TABLE ATTENDANCE (
     attendance_id SERIAL PRIMARY KEY,
     study_id INTEGER REFERENCES STUDY(study_id),
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     check_date DATE,
     atend_sttus_code VARCHAR(20),
     hw_submit_yn VARCHAR(1) DEFAULT 'N'
@@ -249,7 +249,7 @@ COMMENT ON COLUMN ATTENDANCE.hw_submit_yn IS '과제 제출 여부';
 CREATE TABLE FEE_MGMT (
     fee_id SERIAL PRIMARY KEY,
     study_id INTEGER REFERENCES STUDY(study_id),
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     amount INTEGER,
     fee_ty_code VARCHAR(20),
     pay_yn VARCHAR(1) DEFAULT 'N'
@@ -265,7 +265,7 @@ COMMENT ON COLUMN FEE_MGMT.pay_yn IS '납부 여부';
 -- 17. 사용자 배지
 CREATE TABLE BADGES (
     badges_id SERIAL PRIMARY KEY,
-    user_id VARCHAR(36) REFERENCES "USER"(user_id),
+    user_id VARCHAR(36) REFERENCES user_info(user_id),
     badge_name VARCHAR(50),
     earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
