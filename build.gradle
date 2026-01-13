@@ -42,6 +42,8 @@ dependencies {
 
     // Log4j2 스타터 추가
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    //mybatis 추가
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
