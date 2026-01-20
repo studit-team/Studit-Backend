@@ -1,15 +1,15 @@
 package com.studit.domain.user.service;
 
+
+import com.studit.domain.user.dto.SignupRequestDto;
 import com.studit.domain.user.dto.UserDTO;
-import com.studit.domain.user.entity.User;
 import com.studit.domain.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Service
@@ -17,29 +17,42 @@ import java.util.UUID;
 public class UserService {
 
     private final UserMapper userMapper;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public void signup(UserDTO dto) {
-
-        //보안설성 Id
-        String sctryId = "USRCNFRM_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-                + String.format("%03d", (int)(Math.random() * 1000));
-
-        User user = User.builder()
-                .userId(UUID.randomUUID().toString())
-                .username(dto.getUsername())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .email(dto.getEmail())
-                .phone(dto.getPhone())
-                .userStatusCode("Y")
-                .sbscrbBe(LocalDateTime.now())
-                .lgnAprYn("Y")
-                .lgnFailNocs(0)
-                .sctryDtrmnTrgetId(sctryId)
-                .build();
-
-        userMapper.save(user);
+    /**
+     * 이메일 중복 확인
+     */
+    public boolean existsByEmail(String email) {
+        UserDTO user = userMapper.findByEmail(email);
+        return user != null;
     }
 
+    /**
+     * 회원가입
+     */
+    @Transactional
+    public void signup(SignupRequestDto signupRequest) {
+        // 1. 보안 설정 ID 생성
+        String securityId = UUID.randomUUID().toString();
 
+        // 2. 보안 설정 삽입 (기본 권한: USER)
+        userMapper.insertUserScrtyEstbs(securityId, "GENERAL", "USER");
+
+        // 3. 사용자 정보 생성
+        UserDTO userInfo = UserDTO.builder()
+                .userId(UUID.randomUUID().toString())
+                .username(signupRequest.getUsername() != null ? signupRequest.getUsername() : signupRequest.getEmail().split("@")[0])
+                .password(passwordEncoder.encode(signupRequest.getPassword()))
+                .email(signupRequest.getEmail())
+                .phone(signupRequest.getPhone())
+                .userSttusCode("ACTIVE")
+                .sbscrbBe(LocalDateTime.now())
+                .lgnAprvYn("Y")
+                .lgnFailNocs(0)
+                .sctryDtrmnTrgetId(securityId)
+                .build();
+
+        // 4. 사용자 정보 삽입
+        userMapper.insertUserInfo(userInfo);
+    }
 }
