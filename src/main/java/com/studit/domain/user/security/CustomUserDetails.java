@@ -57,8 +57,8 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         // user_sttus_code가 활성 상태인지 확인 (예: "ACTIVE")
-        return user.getUserSttusCode() == null ||
-                "ACTIVE".equals(user.getUserSttusCode());
+        return user.getUserStatusCode() == null ||
+                "ACTIVE".equals(user.getUserStatusCode());
     }
 
     public String getUserId() {

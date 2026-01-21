@@ -13,7 +13,7 @@ public class UserDTO {
     private String password;
     private String phone;
     private String email;
-    private String userSttusCode;
+    private String userStatusCode;
     private LocalDateTime sbscrbBe;
     private String lgnAprvYn;
     private Integer lgnFailNocs;

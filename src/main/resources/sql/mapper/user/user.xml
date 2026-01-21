@@ -11,7 +11,7 @@
         <result property="password" column="password"/>
         <result property="phone" column="phone"/>
         <result property="email" column="email"/>
-        <result property="userSttusCode" column="user_sttus_code"/>
+        <result property="userStatusCode" column="user_status_code"/>
         <result property="sbscrbBe" column="sbscrb_be"/>
         <result property="lgnAprvYn" column="lgn_aprv_yn"/>
         <result property="lgnFailNocs" column="lgn_fail_nocs"/>
@@ -28,7 +28,7 @@
             ui.password,
             ui.phone,
             ui.email,
-            ui.user_sttus_code,
+            ui.user_status_code,
             ui.sbscrb_be,
             ui.lgn_aprv_yn,
             ui.lgn_fail_nocs,
@@ -48,7 +48,7 @@
             ui.password,
             ui.phone,
             ui.email,
-            ui.user_sttus_code,
+            ui.user_status_code,
             ui.sbscrb_be,
             ui.lgn_aprv_yn,
             ui.lgn_fail_nocs,
@@ -110,7 +110,7 @@
             password,
             phone,
             email,
-            user_sttus_code,
+            user_status_code,
             sbscrb_be,
             lgn_aprv_yn,
             lgn_fail_nocs,
@@ -121,12 +121,19 @@
                      #{password},
                      #{phone},
                      #{email},
-                     #{userSttusCode},
+                     #{userStatusCode},
                      #{sbscrbBe},
                      #{lgnAprvYn},
                      #{lgnFailNocs},
                      #{sctryDtrmnTrgetId}
                  )
     </insert>
+
+    <!-- 보안 설정 ID 개수 조회 (prefix로 시작하는) -->
+    <select id="countSecurityIdByPrefix" resultType="int">
+        SELECT COUNT(*)
+        FROM userscrtyestbs
+        WHERE sctry_dtrmn_trget_id LIKE CONCAT(#{prefix}, '%')
+    </select>
 
 </mapper>

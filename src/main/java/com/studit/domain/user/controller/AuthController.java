@@ -19,7 +19,7 @@ public class AuthController {
     /**
      * 회원가입
      */
-    @PostMapping("/signup")
+    @PostMapping("/singup")
     public ResponseEntity<?> signup(@RequestBody SignupRequestDto signupRequest) {
         try {
             // 이메일 중복 확인
@@ -49,6 +49,21 @@ public class AuthController {
             return ResponseEntity.internalServerError()
                     .body(createErrorResponse("회원가입 중 오류가 발생했습니다: " + e.getMessage()));
         }
+    }
+
+    /**
+     * 비밀번호 암호화 테스트 (개발용)
+     */
+    @PostMapping("/encode-password")
+    public ResponseEntity<?> encodePassword(@RequestBody Map<String, String> request) {
+        String plainPassword = request.get("password");
+        String encodedPassword = userService.encodePassword(plainPassword);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("plainPassword", plainPassword);
+        response.put("encodedPassword", encodedPassword);
+        
+        return ResponseEntity.ok(response);
     }
 
     /**

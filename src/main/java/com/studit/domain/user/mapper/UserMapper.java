@@ -44,4 +44,9 @@ public interface UserMapper {
      * 사용자 정보 삽입
      */
     void insertUserInfo(UserDTO userInfo);
+
+    /**
+     * 보안 설정 ID 개수 조회 (prefix로 시작하는)
+     */
+    int countSecurityIdByPrefix(@Param("prefix") String prefix);
 }

@@ -106,16 +106,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                                               AuthenticationException failed)
             throws IOException, ServletException {
 
-        // 이메일로 사용자 조회 후 실패 횟수 증가
-        String email = request.getParameter("email");
-        if (email != null) {
-            var user = userMapper.findByEmail(email);
-            if (user != null) {
-                userMapper.incrementLoginFailCount(user.getUserId());
-                saveLoginHistory(user.getUserId(), request, "FAILURE");
-            }
-        }
-
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
