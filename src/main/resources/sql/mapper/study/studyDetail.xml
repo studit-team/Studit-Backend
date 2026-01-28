@@ -24,13 +24,10 @@
             s.study_nm,
             s.study_dc,
             s.max_mbr_nocs,
-            -- 승인된 멤버 수 계산
             (SELECT COUNT(*) FROM study_mbr sm
-             WHERE sm.study_id = s.study_id AND sm.mbr_sttus_code = 'APPROVED') as current_mbr_count,
-            -- 요일 ID들을 쉼표로 합침
+             WHERE sm.study_id = s.study_id AND sm.mbr_status_code = 'APPROVED') as current_mbr_count,
             (SELECT string_agg(day_id, ',') FROM study_day_mapping sdm
              WHERE sdm.study_id = s.study_id) as regular_days,
-            -- 카테고리 ID들을 쉼표로 합침
             (SELECT string_agg(category_id, ',') FROM study_category_mapping scm
              WHERE scm.study_id = s.study_id) as category_ids
         FROM study s
@@ -125,4 +122,38 @@
         ORDER BY boardId
     </select>
 
+    <insert id="insertStudy" parameterType="com.studit.domain.study.dto.study.StudyCreateDto"
+            useGeneratedKeys="true" keyProperty="studyId">
+        insert into study (leader_id, study_nm, study_dc, mpng_sn, max_mbr_nocs, study_status_code)
+        values (#{leaderId}, #{studyNm}, #{studyDc}, #{mpngSn}, #{maxMbrNocs}, #{studyStatusCode})
+    </insert>
+
+    <insert id="insertStudyCategory">
+        insert into study_category_mapping (study_id, category_id)
+        values
+        <foreach collection="categoryIds" item="categoryId" separator=",">
+            (#{studyId}, #{categoryId})
+        </foreach>
+    </insert>
+
+    <insert id="insertStudyDayOfWeeks">
+        insert into study_day_mapping (study_id, day_id)
+        values
+        <foreach collection="dayIds" item="dayId" separator=",">
+            (#{studyId}, #{dayId})
+        </foreach>
+    </insert>
+
+    <insert id="insertStudyMember">
+        insert into study_mbr (study_id, user_id, role_code, mbr_status_code, join_date)
+        values (#{studyId}, #{leaderId}, 'ROLE_LEADER', 'APPROVED', now())
+    </insert>
+
+    <insert id="insertStudyFee">
+        INSERT INTO fee_mgmt (study_id,user_id,amount,fee_ty_code,pay_yn)
+        VALUES
+        <foreach collection="fees" item="fee" separator=",">
+            (#{studyId},#{leaderId},#{fee.amount},#{fee.feeTyCode},'Y')
+        </foreach>
+    </insert>
 </mapper>

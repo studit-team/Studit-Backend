@@ -27,7 +27,7 @@
             (SELECT COUNT(*)
             FROM study_mbr m
             WHERE m.study_id = s.study_id
-            AND m.mbr_sttus_code = 'APPROVED') as currentMbrCnt
+            AND m.mbr_status_code = 'APPROVED') as currentMbrCnt
         FROM study s
         LEFT JOIN region r ON s.mpng_sn = r.mpng_sn
         <where>

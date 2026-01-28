@@ -4,6 +4,7 @@ import com.studit.domain.study.dto.post.PostDetailRespDto;
 import com.studit.domain.study.dto.post.PostListRespDto;
 import com.studit.domain.study.dto.schedule.AssignmentRespDto;
 import com.studit.domain.study.dto.schedule.ScheduleRespDto;
+import com.studit.domain.study.dto.study.StudyCreateDto;
 import com.studit.domain.study.dto.study.StudyHomeRespDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -54,4 +55,17 @@ public interface StudyDetailMapper {
      * (board 테이블 활용)
      */
     List<PostListRespDto> getStudyFreeBoardList(@Param("studyId") int studyId);
+
+    /**
+     * 1. 스터디 기본 정보 생성
+     * 2. 스터디 카테고리 매핑 정보 저장
+     * 3. 스터디 진행 요일 정보 저장
+     * 4. 스터디 멤버 등록 (최초 생성 시 방장 자동 등록)
+     * 5. 스터디 초기 비용 설정 (보증금/참가비 등)
+     */
+    int insertStudy(StudyCreateDto dto);
+    int insertStudyCategory(StudyCreateDto dto);
+    int insertStudyDayOfWeeks(StudyCreateDto dto);
+    int insertStudyMember(StudyCreateDto dto);
+    int insertStudyFee(StudyCreateDto dto);
 }

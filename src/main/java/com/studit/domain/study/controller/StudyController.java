@@ -1,8 +1,10 @@
 package com.studit.domain.study.controller;
 
+import com.studit.domain.study.dto.study.StudyCreateDto;
 import com.studit.domain.study.dto.study.StudyListReqDto;
 import com.studit.domain.study.service.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +66,17 @@ public class StudyController {
 
         return ResponseEntity.ok(studyService.getCategoryList());
     }
+    @PostMapping("/study")
+    public ResponseEntity<String> createStudy(@RequestBody StudyCreateDto dto) {
+        int result = studyService.createStudyProcess(dto);
+
+        if (result == 1) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("스터디가 성공적으로 생성되었습니다. ID: " + dto.getStudyId());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("스터디 생성에 실패하였습니다.");
+        }
+    }
+
 
 
 }

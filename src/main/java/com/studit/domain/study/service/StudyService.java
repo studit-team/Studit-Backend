@@ -52,15 +52,12 @@ public class StudyService {
 
     @Transactional(readOnly = true)
     public StudyHomeRespDto getStudyHomeData(int studyId) {
-        // 1. 기본 정보 및 인원/요일 정보 조회
         StudyHomeRespDto homeData = studyDetailMapper.getStudyHomeInfo(studyId);
         System.out.printf("" + homeData.getCurrentMbrCount());
         if (homeData != null) {
-            // 2. 이번 주 일정 조회
             List<ScheduleRespDto> schedules = studyDetailMapper.getWeeklySchedules(studyId);
             homeData.setWeeklySchedules(schedules);
 
-            // 3. 최신 공지사항 조회
             List<PostListRespDto> notices = studyDetailMapper.getRecentNotices(studyId);
             homeData.setRecentNotices(notices);
         }
@@ -92,6 +89,29 @@ public class StudyService {
     public List<PostListRespDto> getStudyFreeBoardList(int studyId) {
         return studyDetailMapper.getStudyFreeBoardList(studyId);
     }
+    @Transactional
+    public int createStudyProcess(StudyCreateDto dto) {
+        try {
+            if (studyDetailMapper.insertStudy(dto) == 0) return 0;
+            if (dto.getCategoryIds() != null && !dto.getCategoryIds().isEmpty()) {
+                studyDetailMapper.insertStudyCategory(dto);
+            }
+            if (dto.getDayIds() != null && !dto.getDayIds().isEmpty()) {
+                studyDetailMapper.insertStudyDayOfWeeks(dto);
+            }
+            if (studyDetailMapper.insertStudyMember(dto) == 0) {
+                throw new RuntimeException("방장 등록에 실패하였습니다.");
+            }
+            if (dto.getFees() != null && !dto.getFees().isEmpty()) {
+                studyDetailMapper.insertStudyFee(dto);
+            }
+            return 1;
+
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
 
 
 
